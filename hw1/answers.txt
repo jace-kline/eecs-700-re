@@ -1,0 +1,35 @@
+1. Compare
+gcc pre-proc1.c
+gcc -DCORRECT pre-proc1.c
+How and why does '-DCORRECT' remove errors and warnings?
+The '-DCORRECT' option defines a preprocessor macro called 'CORRECT' upon invocation of gcc. The pre-proc1.c source code contains the conditional macro '#ifdef CORRECT' preceding the #include macros for the stdio.h and math.h libraries. Hence, the CORRECT macro must be defined to include the stdio.h and math.h libraries during the compilation of pre-proc1.c. Without the CORRECT macro defined, these libraries would not be included and a warning will result that mentions an implicit declaration of printf().
+
+2. Compare
+gcc linker.c
+gcc linker.c -lm
+What does '-lm' do to resolve the error?
+Without the '-lm' option, the linker reports an undefined reference to the `pow` symbol. This is because <math.h>, containing pow(), is not part of the C standard library and therefore must be explicitly linked to upon invocation of gcc. The '-lm' option tells the linker to "link the libm library" (the 'libm' library is represented by 'm') which contains <math.h>. Hence, the '-lm' option results in the reference to pow() being resolved, and subsequently the compilation succeeds.
+
+3. Compare 'objdumps' of .o and .exe files
+gcc -c linker3.c
+gcc -L./lib linker3.c foo.c -lmul
+readelf --relocs ./linker3.o
+objdump -D linker3.o > temp1
+objdump -D a.out > temp
+See the entries for 'foo', 'my_mul', and 'printf' in 'temp' and 'temp1'
+What has the linker done in 'a.out' compared to 'linker3.o'?
+In linker3.o, the assembly code contains unresolved links to the addresses of the functions foo, my_mul, and printf. These unresolved addresses are filled with bytes "00 00 00 00" in linker3.o. In a.out, the addresses for each of the functions are resolved and filled with non-zero values. Additionally, stubs are created for the shared library functions (resolved by the linker at runtime) and the PLT and GOT sections are included. The definition of foo() is also included in the a.out binary.
+
+(HW3 - Addendum)
+How and why does -DCORRECT remove errors and warnings during the compilation of pre-proc1.c?
+
+Errors:
+1. redefinition of struct B -> since pre-proc1.c includes defs.h which includes defs2.h, but pre-proc1.c also includes defs2.h directly
+2. implicit declaration of function 'printf' -> need to include <stdio.h> to use printf function
+3. unused variable b (of type struct B)
+
+Why does CORRECT flag fix these issues?
+1. CORRECT flag in defs2.h allows the `#define _DEFS_2_H` macro to be run. 
+Since the entire defs2.h file is guarded with a `#ifndef _DEFS_2_H`, the redundant inclusion of the defs2.h file in pre-proc1.c will be ignored
+2. CORRECT flag in pre-proc1.c allows the `#include <stdio.h>` macro to be run
+3. Not fixed by this flag

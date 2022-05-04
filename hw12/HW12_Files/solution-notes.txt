@@ -1,0 +1,11 @@
+Compile shared lib for LD_PRELOAD:
+> gcc -fPIC -shared -o <lib>.so <lib>.c -ldl
+
+Run with LD_PRELOAD:
+> LD_PRELOAD=./<lib>.so ./prog (...args...)
+
+Problem 1:
+> gcc -fPIC -shared -o p1lib.so p1lib.c -ldl
+> LD_PRELOAD=./p1lib.so ./bin1 passwd
+
+Problem 2:

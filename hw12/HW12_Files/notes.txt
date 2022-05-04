@@ -1,0 +1,28 @@
+Notes:
+
+1. Simple example of using LD_PRELOAD
+   Problem: Given a binary 'bin1'.
+   Get the following output: "Problem solved"
+   Explain how you can use "LD_PRELOAD" to solve this problem. You are not
+   allowed to use any other form of "patching" the binary.
+
+2. Use the ptrace API to get a count of the number of times each function in the binary is reached.
+   
+   (a) You are a working template program, ptrace_template.c, to start.
+   (b) You are also give a library of functions, libdb.so. This file contains:
+       (i) void insert(int addr, char *name)
+       	   Insert a new symbol with 'name' and 'addr' in binary. If the
+	   symbol is already present in the database, then only a message is
+   	   printed. Else, a new record will be created in the database.
+      (ii) void increment(int addr)
+      	   Increment count for the symbol at 'addr'. If there is no record
+	   for 'addr', then nothing is done and the function returns
+   	   cleanly.
+     (iii) void print_data()
+     	   Output all records in the database. This is the final output.
+	   
+   (c) You run the program as follows:
+       $> export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+       $> gcc ptrace_template.c -L./ -ldb
+       $> ./a.out sha.fn sha sha_small.in
+ 

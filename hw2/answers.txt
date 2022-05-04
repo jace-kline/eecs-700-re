@@ -1,0 +1,45 @@
+1. How many instances of 'File-A' are there (across all directories)? (Hint: Use 'find' and 'wc')
+Answer: 40
+Command: find . -name "file-A" | wc -l
+
+2. How many (hard) links are there to the file "grepexp.txt"? (Hint: Use 'ls -l')
+Answer: 5
+Command: ls -l grepexp.txt
+
+3. How many soft/symbolic links are there to the file "grepexp.txt"? (Hint: May use 'find', 'xargs', 'ls -l', and 'grep')
+Answer: 5
+Command: find . -type l -exec ls -l {} \; | grep grepexp.txt | wc -l
+
+4. How many object files are there overall across all directories? (Hint: May use 'find', 'xargs', 'file', and 'grep')
+Answer: 6
+Command: find . -exec file {} \; | grep relocatable | wc -l
+
+5. Run the executable file 'prog.exe'. The input to this program should come from the file 'inp.txt'. Send the output stream to file 'prog.out' and the error stream to 'prog.err'. (Hint: You may have to change the permissions of prog.exe. Use redirection.)
+Outfiles: prog.out, prog.err
+Command: cat inp.txt | ./prog.exe > prog.out 2> prog.err
+
+6. Sort the file 'bin-ls.txt' on the file-size column, with the largest file first. Send the output to 'bin-ls.out'. (Hint: Use 'sort')
+Outfile: bin-ls.out
+Command: sort -k5 -n bin-ls.txt > bin-ls.out
+
+7. Answer the following about 'grepexp.txt'. (Hint: Use 'grep' with regular expressions.)
+
+7.1. How many lines begin with the pattern 'zip'?
+Answer: 7
+Command: grep "^zip" grepexp.txt | wc -l
+
+7.2. How many lines end with the pattern 'zip'?
+Answer: 10
+Command: grep "zip$" grepexp.txt | wc -l
+
+7.3. How many lines begin with a digit (0-9)?
+Answer: 5
+Command: grep "^[0-9]" grepexp.txt | wc -l
+
+7.4. How many lines where 'zip' is preceded and followed by at least one other character?
+Answer: 5
+Command: grep ".zip." grepexp.txt | wc -l
+
+8. Process the 'passwd' file to only display the usernames one-per-line (first word in each row). (Hint: Use 'cut'. Specify field separator and column.)
+Outfile: passwd-usernames.out
+Command: cut -d ':' -f 1 passwd > passwd-usernames.out
