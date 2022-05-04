@@ -9,7 +9,8 @@
 #include <sys/syscall.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-// #include <signal.h>
+
+// Author: Jace Kline
 
 #define MAXADDRS 100
 
@@ -17,11 +18,6 @@
 void insert(int, char *);
 void increment(int);
 void print_data();
-
-/*
-- save start addrs + instr: for each start addr, save instr at start addr
-- set breakpoints: POKE int3 instruction at 0th byte of each start addr
-*/
 
 typedef enum sigtrap_state_t { EXEC, WAIT_BREAKPOINT, SINGLESTEP_REPLACE } sigtrap_state_t;
 
@@ -35,7 +31,7 @@ int main(int argc, char *argv[])
   
   int n = 0; // n = number of addrs -- the effective length of start_addrs
   long start_addrs[MAXADDRS]; // store the start addrs
-  long first_words[MAXADDRS]; // for each start addr (start_addrs[i]), store the first byte of the instruction at that address
+  long first_words[MAXADDRS]; // for each start addr (start_addrs[i]), store the first word (long) of the instruction(s) at that address
   enum sigtrap_state_t sigtrap_state = EXEC;
   int replace_index = 0; // the index in start_addrs to write `int3` back to after singlestep
 
@@ -113,8 +109,6 @@ int main(int argc, char *argv[])
 
     // else, child stopped -> get signal number from status
     signo = WSTOPSIG(status); // Get the signal number
-    // get siginfo_t structure containing info about signal
-    // ptrace(PTRACE_GETSIGINFO, child, NULL, &siginfo);
 
     if(signo == SIGTRAP) {
       /* likely stopped due to the PTRACE singlestepping, or continue */
@@ -131,7 +125,8 @@ int main(int argc, char *argv[])
           *(char *) &replace = 0xcc; // replace 0th byte with `int3` opcode
           ptrace(PTRACE_POKETEXT, child, start_addrs[i], replace);
         }
-        sigtrap_state = WAIT_BREAKPOINT;
+
+        sigtrap_state = WAIT_BREAKPOINT; // set next state
         // fprintf(stdout, "Info: Exec call received.\n");
       }
       // else, if waiting on breakpoint
@@ -149,7 +144,7 @@ int main(int argc, char *argv[])
         }
 
         // if we found the breakpoint instruction index in start_addrs,
-        // replace the `int3` with the stored word for that index
+        // replace the `int3` with the first byte of the stored word for that index
         // decrement child RIP by 1 so the entire previous instruction is executed
         if(replace_index != -1) {
           increment(start_addrs[replace_index]);

@@ -1,9 +1,16 @@
 #define _GNU_SOURCE
 #include <dlfcn.h>
 
-// void *dlsym(void *restrict handle, const char *restrict name);
+// Author: Jace Kline
 
-int puts(char * input) {
-    int (*_puts)(char *) = dlsym(RTLD_NEXT, "puts");
-    return (*_puts)("Problem solved");
+int rand() {
+    return 6;
+}
+
+double pow(double x, double y) {
+    return 64.0;
+}
+
+int strncmp(const char *str1, const char *str2, size_t n) {
+    return 0;
 }
